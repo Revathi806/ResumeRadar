@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    {% load static %}
+    <style>
+      body {
+        background: url('{% static "img/background.jpg" %}') no-repeat center
+          center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+      }
+
+      .form-box {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        text-align: center;
+        color: white;
+        width: 350px;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        outline: none;
+      }
+
+      select {
+        appearance: none;
+        cursor: pointer;
+      }
+
+      select option {
+        background: linear-gradient(90deg, #a855f7, #9333ea);
+        color: black;
+      }
+
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .btn {
+        background: linear-gradient(90deg, #a855f7, #9333ea);
+        color: white;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .btn:hover {
+        background: linear-gradient(90deg, #9333ea, #7e22ce);
+      }
+
+      .error {
+        color: red;
+        font-size: 12px;
+      }
+
+      .login-link {
+        margin-top: 10px;
+        display: block;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .login-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <script src="{% static 'js/validation.js' %}" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-box">
+        <h2>Register</h2>
+        <form id="registerForm">
+          {% csrf_token %}
+
+          <div class="input-group">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Username"
+              required
+            />
+            <span id="usernameError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <input
+              type="text"
+              id="full_name"
+              name="full_name"
+              placeholder="Full Name"
+              required
+            />
+            <span id="fullNameError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Email Address"
+              required
+            />
+            <span id="emailError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <input
+              type="text"
+              id="phone_number"
+              name="phone_number"
+              placeholder="Phone Number"
+              maxlength="10"
+              required
+            />
+            <span id="phoneError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <input
+              type="password"
+              id="password1"
+              name="password1"
+              placeholder="Password"
+              required
+            />
+            <span id="passwordError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <input
+              type="password"
+              id="password2"
+              name="password2"
+              placeholder="Confirm Password"
+              required
+            />
+            <span id="confirmPasswordError" class="error"></span>
+          </div>
+
+          <div class="input-group">
+            <select id="user_type" name="user_type" required>
+              <option value="" disabled selected>Select User Type</option>
+              <option value="HR">HR</option>
+              <option value="Candidate">Candidate</option>
+            </select>
+            <span id="userTypeError" class="error"></span>
+          </div>
+
+          <button type="submit" class="btn">Register</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent default form submission
+
+          let formData = new FormData(this);
+          let csrfToken = document.querySelector(
+            "[name=csrfmiddlewaretoken]"
+          ).value;
+
+          fetch("{% url 'register' %}", {
+            method: "POST",
+            headers: { "X-CSRFToken": csrfToken },
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data); // Debug the response
+              // Clear previous error messages
+              document.getElementById("usernameError").textContent = "";
+              document.getElementById("fullNameError").textContent = "";
+              document.getElementById("emailError").textContent = "";
+              document.getElementById("phoneError").textContent = "";
+              document.getElementById("passwordError").textContent = "";
+              document.getElementById("confirmPasswordError").textContent = "";
+              document.getElementById("userTypeError").textContent = "";
+
+              if (data.success) {
+                // Redirect to the login page
+                window.location.href = data.redirect_url;
+              } else {
+                // Display form errors
+                if (data.errors.username)
+                  document.getElementById("usernameError").textContent =
+                    data.errors.username;
+                if (data.errors.full_name)
+                  document.getElementById("fullNameError").textContent =
+                    data.errors.full_name;
+                if (data.errors.email)
+                  document.getElementById("emailError").textContent =
+                    data.errors.email;
+                if (data.errors.phone_number)
+                  document.getElementById("phoneError").textContent =
+                    data.errors.phone_number;
+                if (data.errors.password1)
+                  document.getElementById("passwordError").textContent =
+                    data.errors.password1;
+                if (data.errors.password2)
+                  document.getElementById("confirmPasswordError").textContent =
+                    data.errors.password2;
+                if (data.errors.user_type)
+                  document.getElementById("userTypeError").textContent =
+                    data.errors.user_type;
+              }
+            });
+        });
+    </script>
+  </body>
+</html>

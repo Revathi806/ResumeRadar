@@ -1,0 +1,42 @@
+
+{% extends 'HR/base.html' %}
+
+{% block title %}HR Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    .stats {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        flex: 1;
+        min-width: 200px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+
+</style>
+<h1 style="color: white;">HR Dashboard</h1>
+<div class="stats">
+    <div class="card">Total Jobs: {{ job_count }}</div>
+    <div class="card">Total Applicants: {{ application_count }}</div>
+    <div class="card">AI Matches: {{ selected_count }}</div>
+</div>
+
+
+
+
+
+
+
+{% endblock %}

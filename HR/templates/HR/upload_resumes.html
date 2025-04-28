@@ -1,0 +1,34 @@
+
+{% extends 'HR/base.html' %}
+
+{% block title %}Upload Resumes{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center; font-family: Arial, sans-serif; color: #333; margin:50px;">Upload Resumes</h1>
+
+<form method="POST" enctype="multipart/form-data" 
+      style="width: 500px; margin: 20px auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    {% csrf_token %}
+    
+    <label for="job" style="display: block; font-weight: bold; margin-bottom: 5px;">Select Job:</label>
+    s<select name="job" id="job" required 
+            style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
+        {% for job in jobs %}
+            <option value="{{ job.id }}">{{ job.title }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="file" style="display: block; font-weight: bold; margin-bottom: 5px;">Resume File:</label>
+    <input type="file" name="file" id="file" required 
+           style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
+
+    <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px;">Description/Keywords:</label>
+    <textarea name="description" id="description" placeholder="Enter description or keywords for the resume" rows="4" required 
+              style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;"></textarea>
+
+    <button type="submit" 
+            style="width: 100%; background: #007bff; color: white; padding: 12px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;">
+        Upload Resume
+    </button>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% load static %}
+<h1>Available Jobs</h1>
+<ul>
+  {% for job in jobs %}
+  <li>
+    <b>{{ job.title }}</b> at {{ job.company }} |
+    <a href="{% url 'apply_now' job.id %}">Apply Now</a>
+  </li>
+  {% endfor %}
+</ul>

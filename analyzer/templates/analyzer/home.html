@@ -1,0 +1,365 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume ATS Checker - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+     body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #121212; /* Dark background */
+        color: #e0e0e0; /* Light text color */
+        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+        overflow: hidden; /* Prevent body scroll */
+      }
+
+      .d-flex {
+        display: flex;
+        height: 100vh; /* Full viewport height */
+      }
+
+      /* Sidebar - Gradient Theme */
+      .sidebar {
+        width: 250px;
+        background: linear-gradient(to bottom, #0f172a, #1e293b);
+        padding: 20px;
+        height: 100vh; /* Fixed height */
+        position: fixed; /* Fixed position */
+        top: 0; /* Align to the top */
+        left: 0; /* Align to the left */
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        transition: width 0.3s;
+        color: #fff;
+        overflow-y: auto; /* Allow scrolling within the sidebar if needed */
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color: #f8fafc;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .menu {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+      }
+
+      .menu li {
+        padding: 8px 0;
+      }
+
+      .menu li a {
+        text-decoration: none;
+        color: #cbd5e1; /* Light text color */
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 8px; /* Rounded corners */
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        transition: color 0.3s; /* Smooth transition */
+      }
+
+      .menu li a::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: rgba(0, 123, 255, 0.5); /* Neon blue */
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.5s;
+        z-index: 0;
+      }
+
+      .menu li a:hover::before {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .menu li a:hover {
+        color: #f8fafc; /* Light text color on hover */
+      }
+
+      .menu .active {
+        background-color: #60a5fa; /* Light blue for active menu */
+        color: #f8fafc; /* Light text color */
+        border-radius: 10px; /* Rounded corners for active button */
+      }
+
+      .settings {
+        margin-top: 20px;
+        font-size: 14px;
+      }
+
+      .settings a {
+        display: block;
+        text-decoration: none;
+        color: #cbd5e1; /* Light text color */
+        margin-top: 10px;
+        transition: color 0.3s;
+      }
+
+      .settings a:hover {
+        color: #60a5fa; /* Bright color on hover */
+      }
+
+      /* Content - Gradient Theme */
+      .content {
+        flex: 1;
+        padding: 30px;
+        margin-left: 250px; /* Leave space for the fixed sidebar */
+        background-color: #1e1e1e; /* Same gradient as sidebar */
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transition: background-color 0.3s;
+        height: 100vh; /* Full viewport height */
+        overflow-y: auto; /* Allow scrolling in the content area */
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #f8fafc; /* Light color for headings */
+      }
+
+      /* Video Background */
+      .video-background {
+        position: fixed;
+        top: 0;
+        left: 16.5%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1; /* Behind other content */
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      /* Additional styles for other elements */
+      .profile {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .profile-pic {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 2px solid #007bff; /* Bright border for profile picture */
+        transition: transform 0.3s; /* Smooth scaling */
+      }
+
+      .profile-pic:hover {
+        transform: scale(1.1); /* Scale effect on hover */
+      }
+
+      .search-container {
+        position: relative;
+        margin-top: 10px;
+      }
+
+      .search-bar {
+        width: 100%;
+        padding: 10px 40px;
+        border-radius: 5px;
+        border: 1px solid #555; /* Darker border */
+        background-color: #333; /* Dark background for input */
+        color: #e0e0e0; /* Light text color */
+        transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+      }
+
+      .search-bar:focus {
+        border-color: #007bff; /* Bright border on focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Glow effect on focus */
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa; /* Light gray for search icon */
+      }
+
+      .job-card {
+        background: #2a2a2a; /* Dark card background */
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s; /* Smooth transition */
+      }
+
+      .job-card:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+      }
+
+      .apply-btn {
+        background: #007bff; /* Bright button color */
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+      }
+
+      .apply-btn:hover {
+        background: #0056b3; /* Darker blue on hover */
+        transform: scale(1.05); /* Slight scale effect on hover */
+      }
+
+      .apply-btn.applied {
+        background: gray; /* Gray for applied button */
+        cursor: not-allowed;
+      }
+
+      .remove-btn {
+        background: red; /* Red for remove button */
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+      }
+
+      .remove-btn:hover {
+        background: darkred; /* Darker red on hover */
+        transform: scale(1.05); /* Slight scale effect on hover */
+      }
+
+      .upload-container {
+        margin-top: 20px;
+      }
+
+      .upload-container input[type="file"] {
+        border: 1px solid #555; /* Darker border */
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #333; /* Dark background for file input */
+        color: #e0e0e0; /* Light text color */
+      }
+
+      .upload-container button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #007bff; /* Bright button color */
+        color: white;
+        transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+      }
+
+      .upload-container button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: scale(1.05); /* Slight scale effect on hover */
+      }
+
+      .uploaded-file {
+        margin-top: 10px;
+        font-weight: bold;
+        color: #e0e0e0; /* Light text color */
+      }
+
+      #applied-jobs-section,
+      #my-resume-section,
+      #notifications-section {
+        display: none;
+      }
+
+  </style>
+</head>
+
+<body>
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2 class="logo">ResumeRadar</h2>
+    <hr />
+    <div class="profile">
+      <h4>{{ user.username }}</h4>
+      <hr />
+    </div>
+    <ul class="menu">
+      <li id="home-tab" class="active"><a href="#">🏠 Home</a></li>
+      <li id="upload-resume-tab"><a href="#">📄 Upload Resume</a></li>
+    </ul>
+    <br />
+    <div class="settings">
+      <a href="#">⚙ Settings</a>
+      <a href="{% url 'logout' %}">🔏 Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <video id="background-video" class="video-background" autoplay loop muted playsinline preload="auto">
+      <source src="{% static 'videos/background.mp4' %}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Home Section -->
+    <div id="home-section" style="text-align: center; margin-top: 20%;">
+      <h1 style="font-weight: bold; font-size: 36px; color: #f8fafc">
+        Welcome to Resume ATS Checker
+      </h1>
+      <p style="font-size: 20px; color: #e0e0e0">
+        Select "Upload Resume" from the menu to analyze your resume!
+      </p>
+    </div>
+
+    <!-- Upload Resume Section -->
+    <div id="upload-resume-section" style="margin-top: 50px; display: none;">
+      <h1 class="mb-4" style="color: #f8fafc;">Upload Resume</h1>
+      <form method="post" enctype="multipart/form-data" class="upload-container">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="{{ form.resume.id_for_label }}" class="form-label">{{ form.resume.label }}</label>
+          {{ form.resume }}
+          <div class="form-text">{{ form.resume.help_text }}</div>
+          {% if error %}
+            <div class="alert alert-danger mt-2">{{ error }}</div>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Check ATS Score</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const showSection = (sectionId) => {
+      document.querySelectorAll(".content > div").forEach(div => {
+        div.style.display = "none";
+      });
+      document.getElementById(sectionId).style.display = "block";
+
+      document.querySelectorAll(".menu li").forEach(li => {
+        li.classList.remove("active");
+      });
+      document.getElementById(`${sectionId.replace("-section", "-tab")}`).classList.add("active");
+    };
+
+    // Default to home
+    showSection("home-section");
+
+    document.getElementById("home-tab").addEventListener("click", () => showSection("home-section"));
+    document.getElementById("upload-resume-tab").addEventListener("click", () => showSection("upload-resume-section"));
+  });
+</script>
+
+</body>
+</html>

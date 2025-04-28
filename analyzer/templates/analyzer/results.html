@@ -1,0 +1,98 @@
+<!-- analyzer/templates/analyzer/results.html -->
+{% extends 'analyzer/base.html' %}
+
+{% block content %}
+<div class="content">
+  <h2>Resume Analysis Results</h2>
+
+  {% if job %}
+    <h3>For position: {{ job.title }}</h3>
+    <p>Your resume scored: <strong>{{ score }}%</strong> for this position</p>
+    {% if general_score %}
+      <p>General resume score: <strong>{{ general_score }}%</strong></p>
+    {% endif %}
+  {% else %}
+    <p>Your resume scored: <strong>{{ score }}%</strong></p>
+  {% endif %}
+
+  <h3>Analysis Details</h3>
+  <p>Resume file: <a href="{{ resume.file.url }}">{{ resume.file.name }}</a></p>
+  <p>Analyzed on: <span id="device-date"></span></p>
+<script>
+  // Get the current date from the device
+  const currentDate = new Date();
+  
+  // Format the date as "Month Day, Year"
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  // Set the date inside the span element
+  document.getElementById('device-date').textContent = formattedDate;
+</script>
+
+  <div>
+    {% if job %}
+      <a href="{% url 'candidate:candidate_dashboard' %}" class="btn btn-secondary">Back to Job</a>
+    {% else %}
+      <a href="{% url 'analyzer:home' %}" class="btn btn-secondary">Analyze Another</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- CSS Styles -->
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+  }
+
+  .content {
+    padding: 30px;
+    background-color: #1e1e1e; /* Same gradient as sidebar */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s;
+  }
+
+  h2 {
+    color: #f8fafc;
+  }
+
+  h3 {
+    color: #60a5fa; /* Light blue */
+  }
+
+  p, a {
+    color: #cbd5e1; /* Light text color */
+  }
+
+  strong {
+    color: #f8fafc; /* Light color for strong text */
+  }
+
+  .btn-secondary {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05); /* Slight scale effect on hover */
+  }
+
+  .btn-secondary:focus {
+    outline: none;
+  }
+</style>
+
+{% endblock %}

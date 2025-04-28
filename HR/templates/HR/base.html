@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}HR Dashboard{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <h2>ResumeRadar</h2>
+        <hr
+          style="
+            margin-top: -5px;
+            border-color: #7e8082;
+            border-top: 3px solid #7e8082;
+          "
+        />
+        <div style="text-align: center">
+          
+          <h2 style="font-weight: 700; margin-top: -5px">{{ user.username }}</h2>
+        </div>
+        <hr
+          style="
+            margin-top: 30px;
+            border-color: #7e8082;
+            border-top: 3px solid #7e8082;
+          "
+        />
+        <ul class="nav-links">
+          <li><a href="{% url 'HR:hr_dashboard' %}">🏠 Home</a></li>
+          <li><a href="{% url 'HR:job_list' %}">🛠️ Jobs</a></li>
+          <li>
+            <a href="{% url 'HR:received_applications' %}">📝 Applications</a>
+          </li>
+        </ul>
+        <hr style="border-color: #7e8082; border-top: 3px solid #7e8082" />
+      </div>
+
+      <div class="sidebar-bottom">
+        <ul class="">
+          <li class="testli">
+            <a class="testNav" href="{% url 'HR:settings' %}">⚙️ Settings</a>
+          </li>
+          <li class="testli">
+            <a class="testNav" href="{% url 'HR:logout' %}">🔏 Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons-container">
+      <a href="{% url 'HR:create_job' %}" class="create-job-btn"
+        >+ Create Job</a
+      >
+      <a href="{% url 'home' %}" class="upload-resume-btn">📁 Upload Resumes</a>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content">{% block content %} {% endblock %}</div>
+  </body>
+</html>
+
+<style>
+  .testNav {
+    display: flex;
+    align-items: start;
+    color: #e0e0e0;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+  }
+  .testli {
+    padding: 0px;
+    :hover {
+      background-color: rgb(111, 45, 169);
+    }
+  }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+  }
+
+  /* Sidebar Container */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 230px;
+    background: linear-gradient(180deg, #1a1a2e, #16213e);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Sidebar Title */
+  .sidebar h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  /* Navigation Links */
+  .nav-links {
+    list-style: none;
+  }
+
+  .nav-links li {
+    margin-bottom: 10px;
+  }
+
+  .nav-links li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e0e0e0;
+    text-decoration: none;
+    padding: 25px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .nav-links li a:hover {
+    background-color: rgb(111, 45, 169);
+    color: white;
+    font-weight: bold;
+  }
+
+  /* Sidebar Bottom Fixed Alignment */
+  .sidebar-bottom {
+    margin-bottom: 5px;
+    padding-top: 20px;
+    margin-left: -100px;
+  }
+
+  /* Buttons container */
+  .buttons-container {
+    margin-left: 250px;
+    padding: 20px;
+  }
+
+  .create-job-btn,
+  .upload-resume-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    margin-right: 10px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .create-job-btn:hover,
+  .upload-resume-btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Content area */
+  .content {
+    margin-left: 250px;
+    padding: 20px;
+    color: #333;
+  }
+</style>

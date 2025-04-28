@@ -1,0 +1,483 @@
+{% extends 'HR/base.html' %}
+{% load static %}
+
+{% block title %}Received Applications{% endblock %}
+
+{% block content %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Toggle sections
+        const toggleSelected = document.querySelector(".toggle-selected");
+        const selectedNotify = document.querySelector(".selectedNotify");
+        const selectedDelete = document.querySelector(".selectedDelete");
+        const selectedSection = document.querySelector(".selected-applications");
+        toggleSelected.addEventListener("click", function () {
+            selectedSection.style.display = selectedSection.style.display === "none" ? "block" : "none";
+            selectedNotify.style.display = selectedNotify.style.display === "none" ? "block" : "none";
+            selectedDelete.style.display = selectedDelete.style.display === "none" ? "block" : "none";
+        });
+
+        const toggleRejected = document.querySelector(".toggle-rejected");
+        const rejectedNotify = document.querySelector(".rejectedNotify");
+        const rejectedDelete = document.querySelector(".rejectedDelete");
+        const rejectedSection = document.querySelector(".rejected-applications");
+        toggleRejected.addEventListener("click", function () {
+            rejectedSection.style.display = rejectedSection.style.display === "none" ? "block" : "none";
+            rejectedNotify.style.display = rejectedNotify.style.display === "none" ? "block" : "none";
+            rejectedDelete.style.display = rejectedDelete.style.display === "none" ? "block" : "none";
+        });
+
+        const toggleRecieved = document.querySelector(".toggle-recieved");
+        const recievedSection = document.querySelector(".recieved-applications");
+        toggleRecieved.addEventListener("click", function () {
+            recievedSection.style.display = recievedSection.style.display === "none" ? "block" : "none";
+        });
+
+        // Delete application
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const appId = this.getAttribute('data-app-id');
+                const url = `/hr/applications/delete/${appId}/`;
+                
+                if (confirm('Are you sure you want to delete this application?')) {
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+        });
+
+        // Delete all rejected applications
+        document.querySelector('.delete-all-rejected').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete ALL rejected applications?')) {
+                fetch("{% url 'HR:delete_all_rejected' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        // Save and delete selected applications
+        document.querySelector('.save-delete-selected').addEventListener('click', function() {
+            if (confirm('Are you sure you want to save and delete ALL selected applications?')) {
+                fetch("{% url 'HR:save_delete_selected' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        // Status update handler
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const form = this.closest('form');
+                form.submit();
+            });
+        });
+
+        // Handle notification forms
+        document.querySelectorAll('form[action*="notify_selected"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('form[action*="notify_rejected"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<br>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 class="toggle-recieved" style="text-align: left; font-size: 30px; margin-bottom: 20px; cursor: pointer; color: white;">
+        Received Applications
+    </h2>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <a href="{% url 'HR:view_selected_applicants' %}" class="btn-blue">See Selected Applicants</a>
+    </div>
+</div>
+
+<div class="container recieved-applications" style="display: none;">
+    {% if applications or shortlisted_applications %}
+    <form method="post" action="{% url 'HR:update_application_status' %}">
+        {% csrf_token %}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Candidate</th>
+                    <th>Job Title</th>
+                    <th>Applied Date</th>
+                    <th>ATS Score</th>
+                    <th>Status</th>
+                    <th>Resume</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>Regular</td>
+                    <td>{{ app.user.username }}</td>
+                    <td>{{ app.job.job_title }}</td>
+                    <td>{{ app.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ app.overall_score }}%;"></div>
+                        </div>
+                        <span class="score-text">{{ app.overall_score }}%</span>
+                    </td>
+                    <td>
+                        <select name="status_{{ app.id }}" class="status-select">
+                            <option value="pending" {% if app.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="accepted" {% if app.status == 'accepted' %}selected{% endif %}>Selected</option>
+                            <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </td>
+                    <td><a href="{{ app.resume_file.url }}" target="_blank" class="btn btn-sm btn-info">View</a></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger delete-btn" data-app-id="{{ app.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                {% for app in shortlisted_applications %}
+                <tr>
+                    <td>Shortlisted</td>
+                    <td>{{ app.user.username }}</td>
+                    <td>{{ app.job.job_title }}</td>
+                    <td>{{ app.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ app.overall_score }}%;"></div>
+                        </div>
+                        <span class="score-text">{{ app.overall_score }}%</span>
+                    </td>
+                    <td>
+                        <select name="shortlist_status_{{ app.id }}" class="status-select">
+                            <option value="pending" {% if app.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="accepted" {% if app.status == 'accepted' %}selected{% endif %}>Selected</option>
+                            <option value="rejected" {% if app.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </td>
+                    <td><a href="{{ app.resume_file.url }}" target="_blank" class="btn btn-sm btn-info">View</a></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger delete-btn" data-app-id="{{ app.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary mt-3">Update Statuses</button>
+        <a href="{% url 'HR:hr_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    </form>
+    {% else %}
+    <p>No applications received.</p>
+    {% endif %}
+</div>
+
+<div class="testBox">
+    <h2 class="toggle-selected" style="text-align: left; font-size: 30px; margin-bottom: 20px; cursor: pointer; color: white;">
+        Selected Applications ({{ selected_count }})
+    </h2>
+    <div>
+        <form method="post" action="{% url 'HR:notify_selected' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="notify selectedNotify" style="display: none;">🔔 Notify Selected</button>
+        </form>
+        <button type="button" class="notify save-delete-selected selectedDelete" style="display: none; background-color: #28a745;">💾 Save & Delete</button>
+    </div>
+</div>
+
+<div class="container selected-applications" style="display: none;">
+    {% if selected_applications %}
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Job Role</th>
+                <th>Candidate</th>
+                <th>Applied Date</th>
+                <th>Resume</th>
+                <th>Score</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in selected_applications %}
+            <tr>
+                <td>{% if app in applications %}Regular{% else %}Shortlisted{% endif %}</td>
+                <td>{{ app.job.job_title }}</td>
+                <td>{{ app.user.username }}</td>
+                <td>{{ app.created_at|date:"M d, Y" }}</td>
+                <td><a href="{{ app.resume_file.url }}" target="_blank" class="btn btn-sm btn-info">View</a></td>
+                <td>{{ app.overall_score }}%</td>
+                <td><span class="badge bg-success">Selected</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No selected applications.</p>
+    {% endif %}
+</div>
+
+<div class="testBox">
+    <h2 class="toggle-rejected" style="text-align: left; font-size: 30px; margin-bottom: 20px; cursor: pointer; color: white;">
+        Rejected Applications ({{ rejected_count }})
+    </h2>
+    <div>
+        <form method="post" action="{% url 'HR:notify_rejected' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="notify rejectedNotify" style="display: none;">🔔 Notify Rejected</button>
+        </form>
+        <button type="button" class="notify delete-all-rejected rejectedDelete" style="display: none; background-color: #dc3545;">🗑️ Delete All</button>
+    </div>
+</div>
+
+<div class="container rejected-applications" style="display: none;">
+    {% if rejected_applications %}
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Job Role</th>
+                <th>Candidate</th>
+                <th>Applied Date</th>
+                <th>Resume</th>
+                <th>Score</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in rejected_applications %}
+            <tr>
+                <td>{% if app in applications %}Regular{% else %}Shortlisted{% endif %}</td>
+                <td>{{ app.job.job_title }}</td>
+                <td>{{ app.user.username }}</td>
+                <td>{{ app.created_at|date:"M d, Y" }}</td>
+                <td><a href="{{ app.resume_file.url }}" target="_blank" class="btn btn-sm btn-info">View</a></td>
+                <td>{{ app.overall_score }}%</td>
+                <td><span class="badge bg-danger">Rejected</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No rejected applications.</p>
+    {% endif %}
+</div>
+
+<style>
+    .toggle-selected:hover,
+    .toggle-recieved:hover,
+    .toggle-rejected:hover {
+        color: #dde3ea;
+        text-decoration: underline;
+    }
+
+    .testBox {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notify {
+        border: none;
+        padding: 10px 20px;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: #007bff;
+        cursor: pointer;
+    }
+
+    .container {
+        width: 90%;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+        background-color: #dde3ea;
+    }
+
+    .styled-table th {
+        background-color: #394a56;
+        color: white;
+        padding: 12px;
+        text-align: left;
+    }
+
+    .styled-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .styled-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .progress-bar-container {
+        width: 100px;
+        height: 8px;
+        background-color: #ddd;
+        border-radius: 4px;
+        position: relative;
+        display: inline-block;
+    }
+    
+    a.btn-blue {
+        background-color: #007bff;
+        color: white !important;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-block;
+    }
+    
+    a.btn-blue:hover {
+        background-color: #0056b3;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background-color: #007bff;
+        border-radius: 4px;
+    }
+
+    .score-text {
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 5px;
+        vertical-align: middle;
+    }
+
+    .status-select {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .badge.bg-success {
+        background-color: #28a745;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .messages {
+        margin: 15px 0;
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+    
+    .alert-error {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+</style>
+
+{% endblock %}

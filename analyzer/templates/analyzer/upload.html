@@ -1,0 +1,32 @@
+{% extends 'analyzer/base.html' %}
+
+{% block content %}
+
+    <div class="container p-5 rounded" style="background-color: #1e1e1e; max-width: 600px;">
+        <h2 class="mb-4">Apply for: {{ job.title }}</h2>
+        <p>{{ job.description }}</p>
+
+        <h3 class="mt-4">Upload Your Resume</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary mt-3">Analyze & Apply</button>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-danger mt-3">
+            {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }
+</style>
+{% endblock %}

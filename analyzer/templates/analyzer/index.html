@@ -1,0 +1,133 @@
+{% extends "analyzer/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Resume Analyzer Dashboard</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'home' %}" class="btn btn-success btn-block mb-3">
+                        <i class="fas fa-file-upload"></i> Analyze General Resume
+                    </a>
+                    {% if jobs %}
+                    <div class="dropdown">
+                        <button class="btn btn-primary btn-block dropdown-toggle" type="button" id="jobDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-briefcase"></i> Analyze for Specific Job
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="jobDropdown">
+                            {% for job in jobs %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'analyze_for_job' job.id %}">
+                                    {{ job.job_title }} - {{ job.company_name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        No jobs available. Please create jobs first.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>Recent Analyses</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_analyses %}
+                    <ul class="list-group">
+                        {% for analysis in recent_analyses %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>
+                                    {% if analysis.job %}
+                                    {{ analysis.job.job_title }}
+                                    {% else %}
+                                    General Analysis
+                                    {% endif %}
+                                </strong>
+                                <br>
+                                <small class="text-muted">{{ analysis.uploaded_at|date:"M d, Y" }}</small>
+                            </div>
+                            <span class="badge bg-{% if analysis.ats_score >= 70 %}success{% else %}warning{% endif %} rounded-pill">
+                                {{ analysis.ats_score|floatformat:1 }}%
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No recent analyses found.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>Job Postings</h5>
+                </div>
+                <div class="card-body">
+                    {% if jobs %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Posted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>{{ job.job_title }}</td>
+                                    <td>{{ job.company_name }}</td>
+                                    <td>{{ job.location }}</td>
+                                    <td>{{ job.get_job_type_display }}</td>
+                                    <td>{{ job.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'analyze_for_job' job.id %}" class="btn btn-sm btn-outline-primary">
+                                            Analyze Resume
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        No job postings available. <a href="/admin/analyzer/job/add/" class="alert-link">Create a job posting</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'HR/base.html' %}
+{% load static %}
+
+{% block title %}Selected Applicants{% endblock %}
+
+{% block content %}
+<style>
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        color: #000;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+
+    .styled-table thead {
+        background-color: #f2f2f2;
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    a.btn-blue {
+        background-color: #007bff;
+        color: white !important;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    a.btn-blue:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="container">
+    <h2 style="color: white; margin-bottom: 30px;">Selected Applicants by Job</h2>
+    
+    {% for job_id, job_data in grouped_applicants.items %}
+    <div class="job-section" style="margin-bottom: 40px;">
+        <h3 style="color: white; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+            {{ job_data.job_title }}
+        </h3>
+        
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Resume</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for applicant in job_data.applicants %}
+                <tr>
+                    <td>{{ applicant.user.username }}</td>
+                    <td>{{ applicant.overall_score }}%</td>
+                    <td><span class="badge bg-success">{{ applicant.status|title }}</span></td>
+                    <td><a href="{{ applicant.resume_file.url }}" target="_blank" class="btn-blue">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% empty %}
+    <p style="color: white;">No selected applicants found.</p>
+    {% endfor %}
+    
+    <a href="{% url 'HR:received_applications' %}" class="btn-blue">Back to Applications</a>
+</div>
+{% endblock %}

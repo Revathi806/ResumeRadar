@@ -1,0 +1,7 @@
+{% load static %}
+<h2>Upload Your Resume for {{ job.title }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Submit Resume</button>
+</form>

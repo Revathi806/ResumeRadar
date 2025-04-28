@@ -1,0 +1,606 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Candidate Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #121212;
+        color: #e0e0e0;
+        overflow: hidden;
+      }
+
+      .d-flex {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 250px;
+        background: linear-gradient(to bottom, #0f172a, #1e293b);
+        padding: 20px;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        color: #fff;
+        overflow-y: auto;
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color: #f8fafc;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .menu {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+      }
+
+      .menu li {
+        padding: 8px 0;
+      }
+
+      .menu li a {
+        text-decoration: none;
+        color: #cbd5e1;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        transition: color 0.3s;
+      }
+
+      .menu li a::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: rgba(0, 123, 255, 0.5);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.5s;
+        z-index: 0;
+      }
+
+      .menu li a:hover::before {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .menu li a:hover {
+        color: #f8fafc;
+      }
+
+      .menu .active {
+        background-color: #60a5fa;
+        color: #f8fafc;
+        border-radius: 10px;
+      }
+
+      .settings {
+        margin-top: 20px;
+        font-size: 14px;
+      }
+
+      .settings a {
+        display: block;
+        text-decoration: none;
+        color: #cbd5e1;
+        margin-top: 10px;
+        transition: color 0.3s;
+      }
+
+      .settings a:hover {
+        color: #60a5fa;
+      }
+
+      /* Content */
+      .content {
+        flex: 1;
+        padding: 30px;
+        margin-left: 250px;
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        height: 100vh;
+        overflow-y: auto;
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #f8fafc;
+      }
+
+      .video-background {
+        position: fixed;
+        top: 0;
+        left: 16.5%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .profile {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .search-container {
+        position: relative;
+        margin-top: 10px;
+      }
+
+      .search-bar {
+        width: 100%;
+        padding: 10px 40px;
+        border-radius: 5px;
+        border: 1px solid #555;
+        background-color: #333;
+        color: #e0e0e0;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      .search-bar:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+      }
+
+      .job-card {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s;
+      }
+
+      .job-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .apply-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .apply-btn:hover {
+        background: #0056b3;
+        transform: scale(1.05);
+      }
+
+      .apply-btn.applied {
+        background: gray;
+        cursor: not-allowed;
+      }
+
+      .filters {
+        margin: 15px 0;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+
+      .filters select {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 1px solid #555;
+        padding: 8px 12px;
+        border-radius: 5px;
+      }
+
+      .filters select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      #no-results-message {
+        text-align: center;
+        padding: 20px;
+        color: #aaa;
+        font-style: italic;
+      }
+
+      #applied-jobs-section,
+      #my-resume-section,
+      #notifications-section,
+      #settings-section {
+        display: none;
+      }
+
+      #settings-section {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .settings-option {
+        background-color: #2a2a2a;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .settings-option h3 {
+        margin-top: 0;
+        color: #60a5fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="d-flex">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h2 class="logo">ResumeRadar</h2>
+        <hr />
+        <div class="profile">
+          <h4>{{ user.username }}</h4>
+          <hr />
+        </div>
+        <ul class="menu">
+          <li id="home-tab" class="active"><a href="#">🏠 Home</a></li>
+          <li id="browse-jobs-tab"><a href="#">🔍 Browse Jobs</a></li>
+          <li id="applied-jobs-tab">
+            <a href="{% url 'candidate:applied-jobs' %}">📂 Applied Jobs</a>
+          </li>
+          <li id="settings-tab"><a href="#">⚙ Settings</a></li>
+          <hr />
+        </ul>
+        <br />
+        <div class="settings">
+          <a href="{% url 'logout' %}">🔏 Logout</a>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <video
+          id="background-video"
+          class="video-background"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="auto"
+        >
+          <source src="{% static 'videos/background.mp4' %}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        <!-- Home Section -->
+        <div id="home-section" style="text-align: center; margin-top: 20%">
+          <h1 style="font-weight: bold; font-size: 36px; color: #f8fafc">
+            Welcome to Your Dashboard
+          </h1>
+          <p style="font-weight: bold; font-size: 20px; color: #e0e0e0">
+            Select an option from the sidebar to get started.
+          </p>
+        </div>
+
+        <!-- Browse Jobs Section -->
+        <div id="browse-jobs-section">
+          <h1>Find Your Next Opportunity</h1>
+          <p>Browse jobs matched to your skills and experience</p>
+
+          <div class="search-container">
+            <i class="search-icon">🔍</i>
+            <input
+              type="text"
+              class="search-bar"
+              id="job-search"
+              placeholder="Search by job title, company, or keywords..."
+            />
+          </div>
+
+          <div class="filters">
+            <select id="job-type-filter" class="form-select">
+              <option value="">All Job Types</option>
+              <option value="full_time">Full Time</option>
+              <option value="part_time">Part Time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+            </select>
+
+            <select id="company-filter" class="form-select">
+              <option value="">All Companies</option>
+              {% for company in unique_companies %}
+              <option value="{{ company }}">{{ company }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="job-listings">
+            {% for job in job_listings %}
+            <div
+              class="job-card"
+              data-job-id="{{ job.id }}"
+              data-job-title="{{ job.job_title|lower }}"
+              data-company="{{ job.company_name|lower }}"
+              data-job-type="{{ job.job_type }}"
+              data-keywords="{{ job.keywords|lower }}"
+            >
+              <h2>{{ job.job_title }}</h2>
+              <h4>{{ job.company_name }}</h4>
+              <p>📍 {{ job.location }} • 💰 {{ job.get_job_type_display }}</p>
+              <p><strong>Description:</strong> {{ job.job_description }}</p>
+
+              <form
+                method="POST"
+                action="{% url 'analyzer:analyze_for_job' job.id %}"
+                enctype="multipart/form-data"
+              >
+                {% csrf_token %}
+                <button type="submit" class="apply-btn">Apply Now</button>
+              </form>
+
+              <div
+                class="resume-upload-container"
+                id="upload-container-{{ job.id }}"
+              >
+                <form
+                  class="resume-upload-form"
+                  enctype="multipart/form-data"
+                  data-job-id="{{ job.id }}"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="job_id" value="{{ job.id }}" />
+                </form>
+                <div
+                  class="upload-status"
+                  id="upload-status-{{ job.id }}"
+                ></div>
+              </div>
+            </div>
+            {% empty %}
+            <p>No jobs available at the moment.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section">
+          <h1 style="text-align: center">Settings</h1>
+
+          <div class="settings-option">
+            <h3>Account Information</h3>
+            <p>Username: {{ user.username }}</p>
+            <p>Email: {{ user.email }}</p>
+          </div>
+
+          <div class="settings-option">
+            <h3>Preferences</h3>
+            <p>Dark mode: Enabled</p>
+            <button class="btn btn-primary">Change Password</button>
+          </div>
+
+          <div class="settings-option">
+            <h3>Danger Zone</h3>
+            <button class="btn btn-danger">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let appliedJobs = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+
+        // === Tab Switching ===
+        const showSection = (sectionId) => {
+          document.querySelectorAll(".content > div").forEach((div) => {
+            div.style.display = "none";
+          });
+          document.getElementById(sectionId).style.display = "block";
+
+          // Highlight active tab
+          document.querySelectorAll(".menu li").forEach((li) => {
+            li.classList.remove("active");
+          });
+          document
+            .getElementById(`${sectionId.replace("-section", "-tab")}`)
+            .classList.add("active");
+        };
+
+        // Show home by default
+        showSection("home-section");
+
+        // === Tab Click Handlers ===
+        document
+          .getElementById("home-tab")
+          .addEventListener("click", () => showSection("home-section"));
+        document
+          .getElementById("browse-jobs-tab")
+          .addEventListener("click", () => showSection("browse-jobs-section"));
+        document
+          .getElementById("applied-jobs-tab")
+          .addEventListener("click", () => showSection("applied-jobs-section"));
+        document
+          .getElementById("settings-tab")
+          .addEventListener("click", () => showSection("settings-section"));
+
+        // === Filter Setup ===
+        document
+          .getElementById("job-search")
+          .addEventListener("input", filterJobs);
+        document
+          .getElementById("job-type-filter")
+          .addEventListener("change", filterJobs);
+        document
+          .getElementById("company-filter")
+          .addEventListener("change", filterJobs);
+
+        // === Filter Function ===
+        function filterJobs() {
+          const searchTerm = document
+            .getElementById("job-search")
+            .value.toLowerCase();
+          const jobTypeFilter =
+            document.getElementById("job-type-filter").value;
+          const companyFilter = document
+            .getElementById("company-filter")
+            .value.toLowerCase();
+          const jobListings = document.getElementById("job-listings");
+
+          // Dim during filtering
+          jobListings.style.opacity = "0.5";
+
+          document.querySelectorAll(".job-card").forEach((card) => {
+            const title = card.dataset.jobTitle;
+            const company = card.dataset.company;
+            const jobType = card.dataset.jobType;
+            const keywords = card.dataset.keywords;
+
+            // Check filters
+            const matchesSearch =
+              searchTerm === "" ||
+              title.includes(searchTerm) ||
+              company.includes(searchTerm) ||
+              keywords.includes(searchTerm);
+
+            const matchesJobType =
+              jobTypeFilter === "" || jobType === jobTypeFilter;
+            const matchesCompany =
+              companyFilter === "" || company.includes(companyFilter);
+
+            // Show/hide based on all filters
+            card.style.display =
+              matchesSearch && matchesJobType && matchesCompany
+                ? "block"
+                : "none";
+          });
+
+          // Check for no results
+          const visibleCards = document.querySelectorAll(
+            '.job-card[style="display: block"]'
+          );
+          const noResults = document.getElementById("no-results-message");
+
+          if (visibleCards.length === 0) {
+            if (!noResults) {
+              const message = document.createElement("p");
+              message.id = "no-results-message";
+              message.textContent = "No jobs match your filters.";
+              jobListings.appendChild(message);
+            }
+          } else if (noResults) {
+            noResults.remove();
+          }
+
+          // Restore opacity
+          setTimeout(() => {
+            jobListings.style.opacity = "1";
+          }, 200);
+        }
+
+        // === Apply Button Handlers ===
+        document.querySelectorAll(".apply-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const jobId = this.getAttribute("data-job-id");
+            const uploadContainer = document.getElementById(
+              `upload-container-${jobId}`
+            );
+
+            // Hide all other containers
+            document
+              .querySelectorAll(".resume-upload-container")
+              .forEach((container) => {
+                if (container !== uploadContainer)
+                  container.style.display = "none";
+              });
+
+            // Toggle current one
+            uploadContainer.style.display =
+              uploadContainer.style.display === "block" ? "none" : "block";
+          });
+        });
+
+        // === Resume Upload Handling ===
+        document.querySelectorAll(".resume-upload-form").forEach((form) => {
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const statusDiv = this.querySelector(".upload-status");
+
+            try {
+              const response = await fetch("/candidate/upload-resume/", {
+                method: "POST",
+                body: formData,
+              });
+
+              const contentType = response.headers.get("content-type");
+              if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                throw new Error(
+                  `Expected JSON but got: ${text.substring(0, 100)}`
+                );
+              }
+
+              const data = await response.json();
+
+              if (!response.ok) {
+                throw new Error(data.error || "Upload failed");
+              }
+
+              statusDiv.textContent = "Upload successful!";
+              statusDiv.style.color = "green";
+            } catch (error) {
+              console.error("Upload error:", error);
+              statusDiv.textContent = `Error: ${error.message}`;
+              statusDiv.style.color = "red";
+            }
+          });
+        });
+
+        // === Disable Apply Buttons for Applied Jobs ===
+        function updateApplyButtons() {
+          document.querySelectorAll(".apply-btn").forEach((btn) => {
+            const jobId = btn.getAttribute("data-job-id");
+            if (appliedJobs.includes(jobId)) {
+              btn.textContent = "✓ Applied";
+              btn.classList.add("applied");
+              btn.disabled = true;
+            }
+          });
+        }
+        updateApplyButtons();
+      });
+    </script>
+  </body>
+</html>
