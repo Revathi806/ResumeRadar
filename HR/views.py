@@ -6,7 +6,7 @@ from shortlist.models import Resume_shortlist
 from .forms import ResumeUploadForm
 from .models import Application,Notification, SelectedApplicant
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -19,6 +19,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 import json
 from django.contrib.auth import logout
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 @login_required
 def create_job(request):
     if request.method == 'POST':
@@ -367,3 +369,24 @@ def view_selected_applicants(request):
         'grouped_applicants': jobs
     }
     return render(request, 'HR/view_selected_applicants.html', context)
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+        return JsonResponse({'success': True})
+    return HttpResponseForbidden()
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  
+            return JsonResponse({'success': True})
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    else:
+        form = PasswordChangeForm(request.user)
+        return render(request, 'HR/change_password_form.html', {'form': form})

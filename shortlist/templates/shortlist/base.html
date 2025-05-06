@@ -1,31 +1,19 @@
-<!-- shortlist/templates/shortlist/base.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title style="font-weight: bold;">Resume Shortlisting App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .container { max-width: 800px; }
-        .resume-card { margin-bottom: 20px; }
-        .progress { height: 25px; }
-    </style>
-</head>
-<body style="background-color:#0e0e0e;">
-    <div class="container py-4" 
-     style="border: 2px solid #080808; 
-            border-radius: 10px; 
-            padding: 25px 30px; 
-            background: linear-gradient(135deg, #2c2c2c, #1a1a1a); 
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); 
-            max-width: 800px; 
-            margin: 30px auto;">
-    {% block content %}{% endblock %}
-</div>
+{% extends "HR/base.html" %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {% block scripts %}{% endblock %}
-</body>
-</html>
+{% block content %}
+<div class="container py-4">
+    {% block shortlist_content %}{% endblock %}
+</div>
+{% endblock %}
+
+<style>
+  /* Shared Container Styling */
+  .container {
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    max-width: 800px;
+    margin: 30px auto;
+  }
+</style>

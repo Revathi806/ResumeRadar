@@ -2,9 +2,9 @@
 
 {% block content %}
 
-    <div class="container p-5 rounded" style="background-color: #1e1e1e; max-width: 600px;">
-        <h2 class="mb-4">Apply for: {{ job.title }}</h2>
-        <p>{{ job.description }}</p>
+    <div class="container p-5 rounded" style="background-color: var(--content-bg); max-width: 600px;border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+        <h2 class="mb-4">Apply for: {{ job.job_title }}</h2>
+        <p>{{ job.job_description }}</p>
 
         <h3 class="mt-4">Upload Your Resume</h3>
         <form method="post" enctype="multipart/form-data">
@@ -24,9 +24,37 @@
 
 
 <style>
+      :root {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --sidebar-bg: linear-gradient(to bottom, #0f172a, #1e293b);
+    --content-bg: #1e1e1e;
+    --card-bg: #2a2a2a;
+    --link-color: #cbd5e1;
+    --hover-color: #60a5fa;
+  }
+  .light-theme {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --sidebar-bg: linear-gradient(to bottom, #e0e0e0, #f5f5f5);
+    --content-bg: #f9f9f9;
+    --card-bg: #ffffff;
+    --link-color: #000;
+    --hover-color: #1976d2;
+  }
     body {
-        background-color: black;
-        color: white;
+        background-color: var(--bg-color);
+        color: var(--text-color);
     }
 </style>
+<script>
+    const body = document.body;
+    const savedTheme = localStorage.getItem("theme");
+  
+    if (savedTheme === "light") {
+      body.classList.add("light-theme");
+    } else {
+      body.classList.remove("light-theme"); // dark theme is default
+    }
+  </script>
 {% endblock %}

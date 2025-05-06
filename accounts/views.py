@@ -86,3 +86,11 @@ def custom_logout(request):
     logout(request)  
     messages.success(request, 'You have been logged out successfully.')  
     return redirect('login') 
+
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        logout(request)
+        user.delete()
+        messages.success(request, "Your account has been deleted successfully.")
+        return redirect('login')

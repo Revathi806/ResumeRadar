@@ -17,30 +17,41 @@ from HR.models import Notification
 
 @login_required
 def candidate_dashboard(request):
-    job_listings = Job.objects.all()  
     
-   
+    # Get all active job listings
+    job_listings = Job.objects.all()
+
+    
+    # Get unique companies for the filter dropdown
+    unique_companies = Job.objects.values_list('company_name', flat=True).distinct()
+    
+    # Get user's applications with related job data
     my_applications = Application.objects.filter(
         user=request.user
     ).select_related('job').order_by('-created_at')
-   
+    
+    # Get notification data
     unread_count = Notification.objects.filter(
         user=request.user,
         is_read=False
     ).count()
-   
+    
     notifications = Notification.objects.filter(
         user=request.user
-    ).order_by('-created_at')[:20]  
-   
+    ).order_by('-created_at')[:20]
+
     context = {
+        'user': request.user,
         'job_listings': job_listings,
+        'unique_companies': unique_companies,
         'my_applications': my_applications,
         'notifications': notifications,
         'unread_count': unread_count,
     }
-    return render(request, 'candidate/candidates_dashboard.html', {'job_listings': job_listings})
-
+    
+    return render(request, 'candidate/candidates_dashboard.html', context)
+    
+    
 logger = logging.getLogger(__name__)
 
 from shortlist.models import Resume_shortlist 

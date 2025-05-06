@@ -1,4 +1,3 @@
-
 {% extends 'HR/base.html' %}
 
 {% block title %}HR Dashboard{% endblock %}
@@ -25,18 +24,96 @@
         color: #333;
     }
 
+    .dashboard-section {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    .dashboard-card {
+        flex: 1;
+        min-width: 260px;
+        max-width: 300px;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        text-align: center;
+        color: #333;
+    }
+
+    .interviews {
+        background: linear-gradient(to right, #7965c9, #d3f5e2);
+    }
+    
+
+    .mock-interviews {
+        background: linear-gradient(to right, #7965c9, #d3f5e2);
+    }
+
+    .networking {
+        background: linear-gradient(to right, #7965c9, #d3f5e2);
+    }
+
+    .dashboard-card h3 {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    .dashboard-card p {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .dashboard-card button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .interviews button {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    .mock-interviews button {
+        background-color: #d9831f;
+        color: white;
+    }
+
+    .networking button {
+        background-color: #6f42c1;
+        color: white;
+    }
 </style>
+
 <h1 style="color: white;">HR Dashboard</h1>
+
 <div class="stats">
     <div class="card">Total Jobs: {{ job_count }}</div>
     <div class="card">Total Applicants: {{ application_count }}</div>
     <div class="card">AI Matches: {{ selected_count }}</div>
 </div>
 
-
-
-
-
-
-
+<div class="dashboard-section">
+    <div class="dashboard-card interviews">
+        <h3>Interviews</h3>
+        <p>Upcoming and past interviews</p>
+        <button>Schedule</button>
+    </div>
+    <div class="dashboard-card mock-interviews">
+        <h3>Performance</h3>
+        <p>Analytics and Reports</p>
+        <button>View</button>
+    </div>
+    <div class="dashboard-card networking">
+        <h3>Workspace</h3>
+        <p>Communicate With Hiring Team</p>
+        <button>Collaborate</button>
+    </div>
+</div>
 {% endblock %}

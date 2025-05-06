@@ -5,7 +5,6 @@
   body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #f5f5f5;
   }
 
   .container {
@@ -14,7 +13,7 @@
     margin-right: 50px;
     padding: 20px;
     width: calc(100% - 310px);
-    background: white;
+    background-color: #1e1e2f;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     min-height: calc(100vh - 100px);
@@ -22,7 +21,6 @@
 
   h2 {
     text-align: center;
-    color: #333;
     margin-bottom: 20px;
   }
 
@@ -32,6 +30,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-top: 20px;
+    background-color: #f3f3f891;
   }
 
   table {
@@ -42,18 +41,20 @@
   th, td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #716e6e;
+    vertical-align: middle;
+    transition: background-color 0.3s;
   }
 
   th {
-    background-color: #007bff;
-    color: white;
+    background-color: #121567;
+    color: rgb(247, 245, 245);
     position: sticky;
     top: 0;
   }
 
   tr:hover {
-    background-color: #f5f5f5;
+    background-color: #dadada5e;
   }
 
   .add-job {
@@ -74,19 +75,25 @@
 
   .action-buttons {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    padding: 0;
+    margin: 0;
   }
 
-  .edit-btn, .delete-btn {
-    padding: 5px 10px;
+  .edit-btn,
+  .delete-btn {
+    padding: 6px 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     transition: all 0.3s;
     text-decoration: none;
-    display: inline-block;
     text-align: center;
+    display: inline-block;
+    white-space: nowrap;
   }
 
   .edit-btn {
@@ -110,7 +117,7 @@
   .no-jobs {
     text-align: center;
     padding: 20px;
-    color: #6c757d;
+    color: #070707;
   }
 
   .job-description {
@@ -124,13 +131,142 @@
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
+    color: white;
   }
 
   .keyword {
-    background-color: #e9ecef;
     padding: 3px 8px;
     border-radius: 10px;
     font-size: 12px;
+    background-color: black;
+  }
+
+  /* Light Mode Styles */
+  .light-mode .container {
+    background-color: #ffffff;
+    color: #111;
+  }
+
+  .light-mode h2 {
+    color: #111;
+  }
+
+  .light-mode .job-table-container {
+    border-color: #ccc;
+  }
+
+  .light-mode th {
+    background-color: rgba(192, 193, 195, 0.932);
+    color: rgb(8, 8, 8);
+  }
+
+  .light-mode tr:hover {
+    background-color: #f5f5f5;
+  }
+
+  .light-mode .add-job {
+    background-color: #006aff;
+  }
+
+  .light-mode .add-job:hover {
+    background-color: #0056b3;
+  }
+
+  .light-mode .edit-btn {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .light-mode .edit-btn:hover {
+    background-color: #218838;
+  }
+
+  .light-mode .delete-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .light-mode .delete-btn:hover {
+    background-color: #c82333;
+  }
+
+  .light-mode .no-jobs {
+    color: #111;
+  }
+
+  .light-mode .job-description {
+    color: #111;
+  }
+
+  .light-mode .keyword {
+    background-color: #ddd;
+    color: #111;
+  }
+
+  /* Dark Mode Styles */
+  .dark-mode .container {
+    background-color: #333;
+    color: #ffffff;
+  }
+
+  .dark-mode h2 {
+    color: #ffffff;
+  }
+
+  .dark-mode .job-table-container {
+    border-color: #443f3f;
+  }
+
+  .dark-mode th {
+    background-color: #007bff;
+    color: rgb(255, 252, 252);
+  }
+
+  .dark-mode tbody tr {
+    background-color: #2a2a2a;
+    transition: background-color 0.3s;
+  }
+
+  .dark-mode tbody tr:hover {
+    background-color: #3a3a3a;
+  }
+
+  .dark-mode .add-job {
+    background-color: #007bff;
+  }
+
+  .dark-mode .add-job:hover {
+    background-color: #0056b3;
+  }
+
+  .dark-mode .edit-btn {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .dark-mode .edit-btn:hover {
+    background-color: #218838;
+  }
+
+  .dark-mode .delete-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .dark-mode .delete-btn:hover {
+    background-color: #c82333;
+  }
+
+  .dark-mode .no-jobs {
+    color: #fff;
+  }
+
+  .dark-mode .job-description {
+    color: #fff;
+  }
+  .dark-mode .keyword {
+    background-color: #666;
+    color: #0a0a0a;
   }
 </style>
 
@@ -169,12 +305,14 @@
             </div>
           </td>
           <td>{{ job.created_at|date:"M d, Y" }}</td>
-          <td class="action-buttons">
-            <a href="{% url 'HR:edit_job' job.id %}" class="edit-btn">Edit</a>
-            <form action="{% url 'HR:delete_job' job.id %}" method="post" style="display: inline;">
-              {% csrf_token %}
-              <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this job?')">Delete</button>
-            </form>
+          <td>
+            <div class="action-buttons">
+              <a href="{% url 'HR:edit_job' job.id %}" class="edit-btn">Edit</a>
+              <form action="{% url 'HR:delete_job' job.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this job?')">Delete</button>
+              </form>
+            </div>
           </td>
         </tr>
         {% empty %}

@@ -22,4 +22,6 @@ urlpatterns = [
     path('applications/notify-selected/', views.notify_selected, name='notify_selected'),
     path('applications/notify-rejected/', views.notify_rejected, name='notify_rejected'),
     path('applications/delete/<int:app_id>/', views.delete_application, name='delete_application'),
+    path('settings/delete_account/', views.delete_account, name='delete_account'),
+    path('settings/change_password/', views.change_password, name='change_password'),
 ]

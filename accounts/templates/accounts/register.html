@@ -62,28 +62,28 @@
       }
 
       select option {
-        background: linear-gradient(90deg, #a855f7, #9333ea);
-        color: black;
-      }
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: black;
+}
 
       input::placeholder {
         color: rgba(255, 255, 255, 0.7);
       }
 
       .btn {
-        background: linear-gradient(90deg, #a855f7, #9333ea);
-        color: white;
-        border: none;
-        padding: 10px;
-        width: 100%;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-      }
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
 
-      .btn:hover {
-        background: linear-gradient(90deg, #9333ea, #7e22ce);
-      }
+.btn:hover {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+}
 
       .error {
         color: red;
@@ -188,6 +188,11 @@
           </div>
 
           <button type="submit" class="btn">Register</button>
+          <div style="margin-top: 15px"></div>
+          <p style="text-align: center">
+            Have an account?
+            <a href="{% url 'login' %}" style="color: #2563eb;font-weight: bold;">Login</a>
+          </p>
         </form>
       </div>
     </div>

@@ -2,6 +2,88 @@
 {% extends 'HR/base.html' %}
 
 {% block content %}
-<h2>Settings</h2>
-<p>This page will display settings.</p>
+<h1 style="text-align: center">Settings</h1>
+
+          <div class="settings-option">
+            <h3>Account Information</h3>
+            <p>Username: {{ user.full_name }}</p>
+            <p>Email: {{ user.email }}</p>
+          </div>
+
+          <!-- Change Password Button -->
+<div class="settings-option">
+    <button class="btn btn-primary" onclick="openPasswordModal()">Change Password</button>
+  </div>
+  
+  <!-- Modal -->
+  <div id="passwordModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closePasswordModal()">&times;</span>
+      <div id="modalBody">Loading...</div>
+    </div>
+  </div>
+  
+  <!-- Delete Account -->
+  <div class="settings-option">
+    <h3>Danger Zone</h3>
+    <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+  </div>
+  
+  <script>
+  function openPasswordModal() {
+    fetch("{% url 'HR:change_password' %}")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('passwordModal').style.display = 'block';
+  
+        document.getElementById('passwordChangeForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+  
+          fetch("{% url 'HR:change_password' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': formData.get('csrfmiddlewaretoken')}
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert('Password changed successfully!');
+              closePasswordModal();
+            } else {
+              alert('Error: ' + JSON.stringify(data.errors));
+            }
+          });
+        });
+      });
+  }
+  
+  function closePasswordModal() {
+    document.getElementById('passwordModal').style.display = 'none';
+  }
+  
+  function deleteAccount() {
+    if (confirm("Are you sure you want to delete your account?")) {
+      fetch("{% url 'HR:delete_account' %}", {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Account deleted.');
+          window.location.href = '/'; // Redirect to home or login
+        }
+      });
+    }
+  }
+  </script>
+  
+  <style>
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
+  .modal-content { background-color: white; margin: 10% auto; padding: 20px; width: 50%; border-radius: 10px; }
+  .close { float: right; font-size: 24px; cursor: pointer; }
+  </style>
+  
 {% endblock %}
